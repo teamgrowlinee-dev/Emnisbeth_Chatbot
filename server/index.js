@@ -2,6 +2,7 @@ const cors = require("cors");
 const express = require("express");
 const path = require("path");
 
+const { hasAnthropic } = require("./src/anthropic");
 const { buildChatResponse } = require("./src/chatService");
 const { streamChatPayload, writeSse } = require("./src/streaming");
 
@@ -19,6 +20,7 @@ app.get("/health", (_req, res) => {
     ok: true,
     service: "emsibeth-chatbot",
     version: "1.0.0",
+    anthropicEnabled: hasAnthropic(),
   });
 });
 

@@ -1,6 +1,12 @@
+const { callAnthropic, hasAnthropic } = require("./anthropic");
 const { searchProducts } = require("./emsibethApi");
 const { detectIntent } = require("./intent");
-const { CONTACT, SUPPORT_MESSAGES } = require("./supportData");
+const {
+  ANTHROPIC_SYSTEM_PROMPT,
+  CONTACT,
+  SUPPORT_MESSAGES,
+  buildSupportContext,
+} = require("./supportData");
 
 function buildSupportResponse(intent) {
   const text =
@@ -10,6 +16,63 @@ function buildSupportResponse(intent) {
     assistantText: text,
     products: [],
   };
+}
+
+async function buildAnthropicSupportResponse(message, intent) {
+  const context = buildSupportContext(intent);
+  const userPrompt = [
+    `Kasutaja sonum: ${message}`,
+    "",
+    "Kontekst:",
+    context,
+    "",
+    "Vasta 1-3 lausega. Kui vaja, lisa lopus sobiv kontakt- voi abilehe viide.",
+  ].join("\n");
+
+  const text = await callAnthropic({
+    systemPrompt: ANTHROPIC_SYSTEM_PROMPT,
+    userPrompt,
+    maxTokens: 220,
+  });
+
+  return text || null;
+}
+
+async function buildAnthropicShoppingText(message, products) {
+  if (!products.length) {
+    return null;
+  }
+
+  const productLines = products.map((product, index) => {
+    const price =
+      typeof product.price === "number" && product.price
+        ? `${product.price} ${product.currency || "EUR"}`
+        : "hind puudub";
+    return [
+      `${index + 1}. ${product.name}`,
+      `SKU: ${product.sku}`,
+      `Hind: ${price}`,
+      `Kirjeldus: ${product.description || "kirjeldus puudub"}`,
+      `URL: ${product.url}`,
+    ].join("\n");
+  });
+
+  const userPrompt = [
+    `Kasutaja otsing: ${message}`,
+    "",
+    "Leitud tooted:",
+    productLines.join("\n\n"),
+    "",
+    "Kirjuta 1-2 lauset, mis votavad tulemused kokku. Ara leiuta uusi tooteid.",
+  ].join("\n");
+
+  const text = await callAnthropic({
+    systemPrompt: ANTHROPIC_SYSTEM_PROMPT,
+    userPrompt,
+    maxTokens: 180,
+  });
+
+  return text || null;
 }
 
 function buildShoppingText(message, products) {
@@ -41,6 +104,19 @@ async function buildChatResponse(message) {
   }
 
   if (intent === "smalltalk") {
+    if (hasAnthropic()) {
+      const anthropicText = await buildAnthropicSupportResponse(
+        cleanMessage,
+        "smalltalk"
+      );
+      if (anthropicText) {
+        return {
+          mode: "smalltalk",
+          assistantText: anthropicText,
+          products: [],
+        };
+      }
+    }
     return {
       mode: "smalltalk",
       assistantText: SUPPORT_MESSAGES.smalltalk,
@@ -49,6 +125,19 @@ async function buildChatResponse(message) {
   }
 
   if (intent === "escalation") {
+    if (hasAnthropic()) {
+      const anthropicText = await buildAnthropicSupportResponse(
+        cleanMessage,
+        "escalation"
+      );
+      if (anthropicText) {
+        return {
+          mode: "support",
+          assistantText: anthropicText,
+          products: [],
+        };
+      }
+    }
     return {
       mode: "support",
       assistantText: SUPPORT_MESSAGES.escalation,
@@ -57,14 +146,31 @@ async function buildChatResponse(message) {
   }
 
   if (intent.startsWith("support_")) {
+    if (hasAnthropic()) {
+      const anthropicText = await buildAnthropicSupportResponse(
+        cleanMessage,
+        intent
+      );
+      if (anthropicText) {
+        return {
+          mode: "support",
+          assistantText: anthropicText,
+          products: [],
+        };
+      }
+    }
     return buildSupportResponse(intent);
   }
 
   const searchResult = await searchProducts(cleanMessage, { limit: 6 });
   if (searchResult.items.length) {
+    const anthropicText = hasAnthropic()
+      ? await buildAnthropicShoppingText(cleanMessage, searchResult.items)
+      : null;
     return {
       mode: "shopping",
-      assistantText: buildShoppingText(cleanMessage, searchResult.items),
+      assistantText:
+        anthropicText || buildShoppingText(cleanMessage, searchResult.items),
       products: searchResult.items,
       searchTerms: searchResult.searchTerms,
     };
@@ -81,7 +187,10 @@ async function buildChatResponse(message) {
 
   return {
     mode: "support",
-    assistantText: `${SUPPORT_MESSAGES.general} Koige kiirem kontakt on ${CONTACT.email} voi ${CONTACT.phone}.`,
+    assistantText: hasAnthropic()
+      ? (await buildAnthropicSupportResponse(cleanMessage, "general")) ||
+        `${SUPPORT_MESSAGES.general} Koige kiirem kontakt on ${CONTACT.email} voi ${CONTACT.phone}.`
+      : `${SUPPORT_MESSAGES.general} Koige kiirem kontakt on ${CONTACT.email} voi ${CONTACT.phone}.`,
     products: [],
   };
 }

@@ -36,8 +36,71 @@ const SUPPORT_MESSAGES = {
     `Tellimuse staatuse, hilinemise voi tarneprobleemi korral kirjuta ${CONTACT.email} voi helista ${CONTACT.phone} (${CONTACT.hours}). Lisa kindlasti tellimuse number ja lyhike probleemi kirjeldus.`,
 };
 
+const STORE_KNOWLEDGE = [
+  `Pood: Emsibeth / ESTIA OU`,
+  `Telefon: ${CONTACT.phone}`,
+  `E-post: ${CONTACT.email}`,
+  `Tooaeg: ${CONTACT.hours}`,
+  `Aadress: ${CONTACT.address}`,
+  "",
+  `Tarne: tasuta tarne alates 45 eurost, tavahind alates 3 eurost.`,
+  "Tarneviisid: Omniva pakiautomaat, Itella Smartpost pakiautomaat.",
+  "Tavakauba tarneaeg: kuni 3 toopaeeva ostu sooritamisest, kui tootel pole pikemat tarneaega.",
+  "",
+  "Tagastus ja vahetamine:",
+  "Kliendil on oigus taganeda lepingust 14 kalendripaeeva jooksul alates kauba kattesaamisest.",
+  "Tagastatav kaup peab olema kasutamata ja originaalpakendis.",
+  "Tagastamisega seotud otsesed kulud kannab klient.",
+  "",
+  "Makse:",
+  "Tasuda saab Eesti pangalinkidega, Visa/MasterCardiga voi arve alusel.",
+  "Tellimus kinnitatakse parast ostusumma laekumist.",
+  "",
+  `Kontaktleht: ${LINKS.contact}`,
+  `Tarneleht: ${LINKS.delivery}`,
+  `Tagastusleht: ${LINKS.returns}`,
+  `Muugitingimused: ${LINKS.terms}`,
+].join("\n");
+
+const ANTHROPIC_SYSTEM_PROMPT = [
+  "Sa oled Emsibethi klienditoe ja poe assistent.",
+  "Vasta eesti keeles, luhidalt ja konkreetselt.",
+  "Kui kusimus on klienditoe kohta, vasta ainult allpool toodud poeteabe pohjal.",
+  "Ara leiuta tarne-, tagastus-, makse- ega kontaktitingimusi.",
+  "Kui kasutaja otsib toodet, kasuta tooteandmeid, mis antakse eraldi kontekstina.",
+  `Kui infost ei piisa, suuna kasutaja kirjutama ${CONTACT.email} voi helistama ${CONTACT.phone}.`,
+  "",
+  "POE TEAVE:",
+  STORE_KNOWLEDGE,
+].join("\n");
+
+function buildSupportContext(intent) {
+  if (intent === "support_shipping") {
+    return SUPPORT_MESSAGES.shipping;
+  }
+  if (intent === "support_returns") {
+    return SUPPORT_MESSAGES.returns;
+  }
+  if (intent === "support_payment") {
+    return SUPPORT_MESSAGES.payment;
+  }
+  if (intent === "support_contact") {
+    return SUPPORT_MESSAGES.contact;
+  }
+  if (intent === "support_order") {
+    return SUPPORT_MESSAGES.order;
+  }
+  if (intent === "escalation") {
+    return SUPPORT_MESSAGES.escalation;
+  }
+  return SUPPORT_MESSAGES.general;
+}
+
 module.exports = {
+  ANTHROPIC_SYSTEM_PROMPT,
   CONTACT,
   LINKS,
   SUPPORT_MESSAGES,
+  STORE_KNOWLEDGE,
+  buildSupportContext,
 };

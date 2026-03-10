@@ -6,6 +6,7 @@ Praegune V1:
 
 - vastab klienditoe teemadel: tarne, tagastus, makse, kontakt, tellimus
 - otsib tooteid live Magento GraphQL-ist `https://emsibeth.ee/graphql`
+- kasutab soovi korral Anthropicut tekstivastuste jaoks
 - streamib vastuse `POST /api/chat/stream` endpointist
 - serveerib oma widgetit, loaderit ja demo lehte
 
@@ -21,6 +22,15 @@ Praegune V1:
 cd server
 npm install
 npm start
+```
+
+Kui tahad kasutada Anthropicut, lisa enne kaivitus oma `.env` faili:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_MODEL=claude-sonnet-4-20250514
+ANTHROPIC_MAX_TOKENS=320
+ANTHROPIC_VERSION=2023-06-01
 ```
 
 Seejarel ava:
@@ -73,3 +83,14 @@ Support knowledge on paigaldatud lokaalsesse knowledge baasi `emsibeth.ee` avali
 - `/muugitingimused`
 
 Tooteotsing tuleb otse `emsibeth.ee/graphql` kaudu, seega tulemused on live.
+
+## Render env vars
+
+Renderis pane:
+
+- `ANTHROPIC_API_KEY`
+- `ANTHROPIC_MODEL`
+- `ANTHROPIC_MAX_TOKENS`
+- `ANTHROPIC_VERSION`
+- `EMSIBETH_GRAPHQL_URL`
+- `EMSIBETH_STORE_URL`
