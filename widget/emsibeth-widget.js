@@ -39,7 +39,14 @@
   var launcher = createElement(
     "button",
     "ems-chatbot__launcher",
-    '<span class="ems-chatbot__launcher-dot"></span><span>' +
+    '<span class="ems-chatbot__launcher-icon" aria-hidden="true">' +
+      '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M12 3C6.477 3 2 7.03 2 12c0 2.09.79 4.013 2.11 5.532V21l3.856-1.928C9.22 19.68 10.58 20 12 20c5.523 0 10-4.03 10-9s-4.477-8-10-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>' +
+      '<path d="M8 10.25h8M8 13.75h5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>' +
+      "</svg>" +
+      "</span>" +
+      '<span class="ems-chatbot__launcher-dot" aria-hidden="true"></span>' +
+      '<span class="ems-chatbot__sr-only">' +
       escapeHtml(config.launcherLabel) +
       "</span>"
   );
