@@ -298,4 +298,5 @@
   });
 
   appendBubble("assistant", config.welcomeMessage);
+  setPanelOpen(true);
 })();
