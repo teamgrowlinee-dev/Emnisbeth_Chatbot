@@ -1,6 +1,7 @@
 const { callAnthropic, hasAnthropic } = require("./anthropic");
 const { searchProducts } = require("./emsibethApi");
 const { detectIntent } = require("./intent");
+const { maybeBuildProductFollowUp } = require("./productFinder");
 const {
   ANTHROPIC_SYSTEM_PROMPT,
   CONTACT,
@@ -168,12 +169,21 @@ async function buildChatResponse(message) {
 
   const searchResult = await searchProducts(cleanMessage, { limit: 6 });
   if (!searchResult.searchTerms.length) {
+    const finderPayload = await maybeBuildProductFollowUp(cleanMessage);
+    if (finderPayload) {
+      return finderPayload;
+    }
     return {
       mode: "shopping",
       assistantText: buildShoppingClarificationText(),
       products: [],
       searchTerms: [],
     };
+  }
+
+  const finderPayload = await maybeBuildProductFollowUp(cleanMessage);
+  if (finderPayload) {
+    return finderPayload;
   }
 
   if (searchResult.items.length) {

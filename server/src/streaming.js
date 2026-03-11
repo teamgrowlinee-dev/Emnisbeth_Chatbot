@@ -44,6 +44,15 @@ async function streamChatPayload(res, payload) {
     writeSse(res, "products", { items: payload.products });
   }
 
+  if (payload.question) {
+    writeSse(res, "followup", {
+      mode: payload.mode,
+      question: payload.question,
+      answers: payload.answers || {},
+      originalMessage: payload.originalMessage || "",
+    });
+  }
+
   writeSse(res, "done", payload);
   res.end();
 }

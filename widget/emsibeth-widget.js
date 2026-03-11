@@ -153,6 +153,7 @@
   var isBusy = false;
   var initialized = false;
   var quizState = null;
+  var productFinderState = null;
   var hairQuizQuestions = null;
   var hairQuizPromise = null;
 
@@ -167,11 +168,11 @@
   }
 
   function refreshComposerAvailability() {
-    var quizActive = !!quizState;
-    input.disabled = isBusy || quizActive;
-    sendButton.disabled = isBusy || quizActive;
+    var guidedModeActive = !!quizState || !!productFinderState;
+    input.disabled = isBusy || guidedModeActive;
+    sendButton.disabled = isBusy || guidedModeActive;
     sendButton.textContent = isBusy ? "Laen..." : "Saada";
-    input.placeholder = quizActive
+    input.placeholder = guidedModeActive
       ? "Vali vastus allolevatest variantidest"
       : "Kusi toodete voi klienditoe kohta!";
   }
@@ -198,7 +199,7 @@
     }
 
     var isQuizOptions = items.every(function (item) {
-      return item && item.kind === "quiz-option";
+      return item && (item.kind === "quiz-option" || item.kind === "finder-option");
     });
 
     if (isQuizOptions) {
@@ -213,7 +214,7 @@
       );
       button.type = "button";
       button.title = item.label;
-      if (item.kind === "quiz-option") {
+      if (item.kind === "quiz-option" || item.kind === "finder-option") {
         button.classList.add("ems-chatbot__chip--option");
       }
       button.addEventListener("click", function () {
@@ -481,6 +482,99 @@
     askCurrentQuizQuestion();
   }
 
+  function setProductFinderQuestion(payload, originalMessage) {
+    var question = payload && payload.question;
+    if (!question || !Array.isArray(question.options)) return;
+
+    productFinderState = {
+      originalMessage: originalMessage || (payload && payload.originalMessage) || "",
+      answers: Object.assign({}, (payload && payload.answers) || {}),
+      question: question,
+    };
+
+    refreshComposerAvailability();
+    setQuickActions(
+      question.options.map(function (option) {
+        return {
+          label: option.label,
+          kind: "finder-option",
+          value: option.value,
+        };
+      })
+    );
+  }
+
+  function clearProductFinderState() {
+    productFinderState = null;
+    refreshComposerAvailability();
+  }
+
+  function appendFinderResult(payload) {
+    var node = appendMessage("assistant", formatMessageHtml(payload.assistantText || ""));
+    appendProducts(node.wrapper, payload.products || []);
+    clearProductFinderState();
+    setQuickActions([
+      { label: "Tapsusta uut otsingut", kind: "message", message: "soovita toodet" },
+      { label: "Juuksetuubi test", kind: "quiz-start" },
+      { label: "Tarne info", kind: "message", message: "tarne" },
+      { label: "Kontakt", kind: "message", message: "kontakt" },
+    ]);
+  }
+
+  function handleFinderAnswer(action) {
+    if (!productFinderState || !productFinderState.question) return;
+
+    var option = productFinderState.question.options.find(function (item) {
+      return item.value === action.value;
+    });
+    if (!option) return;
+
+    var nextAnswers = Object.assign({}, productFinderState.answers, {});
+    nextAnswers[productFinderState.question.id] = option.value;
+    appendBubble("user", option.label);
+    setQuickActions([]);
+    setBusy(true);
+
+    fetch(config.apiBase + "/api/product-finder", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: productFinderState.originalMessage,
+        answers: nextAnswers,
+      }),
+    })
+      .then(function (response) {
+        return response.json().then(function (payload) {
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.error || "Tooteotsing ei andnud tulemust.");
+          }
+          return payload;
+        });
+      })
+      .then(function (payload) {
+        if (payload.mode === "product_followup" && payload.question) {
+          appendBubble("assistant", payload.assistantText || "");
+          setProductFinderQuestion(payload, productFinderState.originalMessage);
+          return;
+        }
+
+        appendFinderResult(payload);
+      })
+      .catch(function (error) {
+        clearProductFinderState();
+        appendBubble(
+          "assistant",
+          (error && error.message) || "Tooteotsingu tapsustamine ebaonnestus."
+        );
+        setQuickActions(defaultActions);
+      })
+      .finally(function () {
+        setBusy(false);
+      });
+  }
+
   function startHairQuiz() {
     setQuickActions([]);
     appendBubble(
@@ -512,7 +606,7 @@
   }
 
   function handleAction(action) {
-      if (!action) return;
+    if (!action) return;
     if (isBusy) return;
     if (action.kind === "quiz-start") {
       startHairQuiz();
@@ -520,6 +614,10 @@
     }
     if (action.kind === "quiz-option") {
       handleQuizAnswer(action);
+      return;
+    }
+    if (action.kind === "finder-option") {
+      handleFinderAnswer(action);
       return;
     }
     if (action.message) {
@@ -578,6 +676,9 @@
         throw new Error(fallbackJson.error || "Vastust ei saanud.");
       }
       setAssistantText(assistantNode, fallbackJson.assistantText || "");
+      if (fallbackJson.mode === "product_followup" && fallbackJson.question) {
+        setProductFinderQuestion(fallbackJson, message);
+      }
       appendProducts(assistantNode.wrapper, fallbackJson.products || []);
       return;
     }
@@ -605,6 +706,8 @@
           setAssistantText(assistantNode, assistantNode.text);
         } else if (parsed.event === "products") {
           appendProducts(assistantNode.wrapper, parsed.payload.items || []);
+        } else if (parsed.event === "followup") {
+          setProductFinderQuestion(parsed.payload, message);
         } else if (parsed.event === "error") {
           throw new Error(parsed.payload.message || "Viga streamimisel.");
         }
@@ -624,9 +727,10 @@
 
   async function sendMessage(message) {
     var text = String(message || "").trim();
-    if (!text || isBusy || quizState) return;
+    if (!text || isBusy || quizState || productFinderState) return;
 
     ensureWelcomeMessages();
+    clearProductFinderState();
     appendBubble("user", text);
     var assistantNode = appendTyping();
     input.value = "";
@@ -645,7 +749,9 @@
       );
     } finally {
       setBusy(false);
-      setQuickActions(defaultActions);
+      if (!quizState && !productFinderState) {
+        setQuickActions(defaultActions);
+      }
       input.focus();
       scrollToBottom();
     }

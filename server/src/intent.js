@@ -16,7 +16,7 @@ const SUPPORT_ORDER_RE =
   /(tellimus|order|kus mu pakk|kus pakk|tellimuse staatus|staatus|tellimuse number|hilineb)/i;
 
 const SHOPPING_KEYWORDS_RE =
-  /(otsi|leia|soovita|soovin|tahan|kas teil on|kas on|sampoon|šampoon|shampoo|palsam|conditioner|mask|seerum|sprei|spray|kuivsampoon|parfuum|parfüüm|kreem|toode|tooteid|juustele|peanahk|juuksed|kinkekaart)/i;
+  /(otsi|leia|soovita|soovin|tahan|kas teil on|kas on|sampoon|šampoon|shampoo|palsam|conditioner|mask|seerum|sprei|spray|kuivsampoon|parfuum|parfüüm|kreem|toode|tooteid|juustele|peanahk|juuksed|kinkekaart|sortiment|tootesari|sari|juuksetuup|juuksetuubi)/i;
 
 function detectIntent(message) {
   const text = String(message || "").trim();

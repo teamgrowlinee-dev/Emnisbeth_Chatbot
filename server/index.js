@@ -6,6 +6,7 @@ const { hasAnthropic } = require("./src/anthropic");
 const { buildChatResponse } = require("./src/chatService");
 const { buildHairProfileResponse } = require("./src/hairProfileService");
 const { getPublicHairQuizQuestions } = require("./src/hairQuiz");
+const { continueProductFinder } = require("./src/productFinder");
 const { streamChatPayload, writeSse } = require("./src/streaming");
 
 const app = express();
@@ -97,6 +98,27 @@ app.post("/api/hair-profile", async (req, res) => {
   try {
     const answers = req.body && req.body.answers;
     const payload = await buildHairProfileResponse(answers);
+    return res.json({
+      ok: true,
+      ...payload,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      ok: false,
+      error: String(error && error.message ? error.message : error),
+    });
+  }
+});
+
+app.post("/api/product-finder", async (req, res) => {
+  try {
+    const message = String((req.body && req.body.message) || "").trim();
+    if (!message) {
+      return res.status(400).json({ ok: false, error: "Missing message" });
+    }
+
+    const answers = (req.body && req.body.answers) || {};
+    const payload = await continueProductFinder(message, answers);
     return res.json({
       ok: true,
       ...payload,
