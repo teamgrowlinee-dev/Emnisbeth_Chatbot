@@ -580,6 +580,19 @@
   margin: 0;
 }
 
+.ems-chatbot__product-role {
+  display: inline-flex;
+  margin: 0 0 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(221, 179, 200, 0.14);
+  color: #f2dbe7;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .ems-chatbot__product-body h3 {
   color: var(--ems-text);
   font-size: 14px;
@@ -601,6 +614,13 @@
 .ems-chatbot__product-description {
   margin-top: 8px !important;
   color: #d0bbc6;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.ems-chatbot__product-reason {
+  margin-top: 8px !important;
+  color: #f1dde8;
   font-size: 12px;
   line-height: 1.55;
 }

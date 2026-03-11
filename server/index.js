@@ -4,6 +4,8 @@ const path = require("path");
 
 const { hasAnthropic } = require("./src/anthropic");
 const { buildChatResponse } = require("./src/chatService");
+const { buildHairProfileResponse } = require("./src/hairProfileService");
+const { getPublicHairQuizQuestions } = require("./src/hairQuiz");
 const { streamChatPayload, writeSse } = require("./src/streaming");
 
 const app = express();
@@ -24,6 +26,13 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.get("/api/hair-quiz", (_req, res) => {
+  res.json({
+    ok: true,
+    questions: getPublicHairQuizQuestions(),
+  });
+});
+
 app.use("/widget", express.static(widgetDir, { maxAge: "1h" }));
 
 app.get(["/", "/demo"], (_req, res) => {
@@ -41,7 +50,7 @@ app.get("/widget/loader.js", (_req, res) => {
       brandName: "Emsibeth",
       launcherLabel: "Kusi toodete voi klienditoe kohta",
       tooltipTitle: "Tere!",
-      tooltipText: "Kusi toodete voi klienditoe kohta.",
+      tooltipText: "Tee juuksetuubi test voi kusi toodete ja klienditoe kohta.",
       vendor: "growlinee",
       widgetVersion: "v1.0.0"
     },
@@ -78,6 +87,22 @@ app.post("/api/chat", async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
+      ok: false,
+      error: String(error && error.message ? error.message : error),
+    });
+  }
+});
+
+app.post("/api/hair-profile", async (req, res) => {
+  try {
+    const answers = req.body && req.body.answers;
+    const payload = await buildHairProfileResponse(answers);
+    return res.json({
+      ok: true,
+      ...payload,
+    });
+  } catch (error) {
+    return res.status(400).json({
       ok: false,
       error: String(error && error.message ? error.message : error),
     });

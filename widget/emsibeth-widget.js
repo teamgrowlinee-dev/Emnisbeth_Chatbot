@@ -10,23 +10,23 @@
       brandName: "Emsibeth",
       launcherLabel: "Kusi toodete voi klienditoe kohta",
       tooltipTitle: "Tere!",
-      tooltipText: "Kusi toodete voi klienditoe kohta.",
+      tooltipText: "Tee juuksetuubi test voi kusi toodete ja klienditoe kohta.",
       welcomeMessage:
-        "Tere! Ma olen Emsibethi assistent. Aitan sul leida sobivaid tooteid ja vastan klienditoe kusimustele.",
+        "Tere! Ma olen Emsibethi assistent. Aitan sul leida sobivaid tooteid, teha juuksetuubi testi ja vastan klienditoe kusimustele.",
       exampleMessage:
-        'Naiteks void kirjutada: "otsi mask kuivadele juustele" voi "kuidas tagastus kaib?"',
+        'Naiteks void teha "Juuksetuubi testi", kirjutada "otsi mask kuivadele juustele" voi kysida "kuidas tagastus kaib?"',
       poweredByUrl: "https://growlinee.com/ee",
       poweredByLabel: "Powered by Growlinee",
     },
     window.EMSIBETH_CHATBOT_CONFIG || {}
   );
 
-  var quickActions = [
-    { label: "Tarne info", message: "tarne" },
-    { label: "Tagastamine", message: "tagastus" },
-    { label: "Makseviisid", message: "makse" },
-    { label: "Kontakt", message: "kontakt" },
-    { label: "Otsi tooteid", message: "otsi juuksehooldus" },
+  var defaultActions = [
+    { label: "Juuksetuubi test", kind: "quiz-start" },
+    { label: "Tarne info", kind: "message", message: "tarne" },
+    { label: "Tagastamine", kind: "message", message: "tagastus" },
+    { label: "Makseviisid", kind: "message", message: "makse" },
+    { label: "Kontakt", kind: "message", message: "kontakt" },
   ];
 
   function escapeHtml(value) {
@@ -152,6 +152,9 @@
 
   var isBusy = false;
   var initialized = false;
+  var quizState = null;
+  var hairQuizQuestions = null;
+  var hairQuizPromise = null;
 
   function scrollToBottom() {
     messages.scrollTop = messages.scrollHeight;
@@ -161,6 +164,16 @@
     input.style.height = "0px";
     var nextHeight = Math.min(input.scrollHeight, 140);
     input.style.height = Math.max(nextHeight, 52) + "px";
+  }
+
+  function refreshComposerAvailability() {
+    var quizActive = !!quizState;
+    input.disabled = isBusy || quizActive;
+    sendButton.disabled = isBusy || quizActive;
+    sendButton.textContent = isBusy ? "Laen..." : "Saada";
+    input.placeholder = quizActive
+      ? "Vali vastus allolevatest variantidest"
+      : "Kusi toodete voi klienditoe kohta!";
   }
 
   function setPanelOpen(nextOpen) {
@@ -191,7 +204,7 @@
       );
       button.type = "button";
       button.addEventListener("click", function () {
-        sendMessage(item.message);
+        handleAction(item);
       });
       chips.appendChild(button);
     });
@@ -283,10 +296,15 @@
 
       var price = formatPrice(product);
       var description = escapeHtml(product.description || "").slice(0, 220);
+      var role = escapeHtml(product.recommendationRole || "");
+      var reason = escapeHtml(product.recommendationReason || "");
 
       card.innerHTML =
         image +
         '<div class="ems-chatbot__product-body">' +
+        (role
+          ? '<p class="ems-chatbot__product-role">' + role + "</p>"
+          : "") +
         "<h3>" +
         escapeHtml(product.name) +
         "</h3>" +
@@ -298,6 +316,9 @@
           : "") +
         (description
           ? '<p class="ems-chatbot__product-description">' + description + "</p>"
+          : "") +
+        (reason
+          ? '<p class="ems-chatbot__product-reason">' + reason + "</p>"
           : "") +
         '<span class="ems-chatbot__product-cta">Ava toode</span>' +
         "</div>";
@@ -311,9 +332,186 @@
 
   function setBusy(nextBusy) {
     isBusy = !!nextBusy;
-    input.disabled = isBusy;
-    sendButton.disabled = isBusy;
-    sendButton.textContent = isBusy ? "Laen..." : "Saada";
+    refreshComposerAvailability();
+  }
+
+  function loadHairQuizQuestions() {
+    if (hairQuizQuestions) {
+      return Promise.resolve(hairQuizQuestions);
+    }
+
+    if (hairQuizPromise) {
+      return hairQuizPromise;
+    }
+
+    hairQuizPromise = fetch(config.apiBase + "/api/hair-quiz")
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("Juuksetuubi testi ei avanenud.");
+        }
+        return response.json();
+      })
+      .then(function (payload) {
+        if (!payload.ok || !Array.isArray(payload.questions)) {
+          throw new Error(payload.error || "Juuksetuubi testi ei ole saadaval.");
+        }
+        hairQuizQuestions = payload.questions;
+        return hairQuizQuestions;
+      })
+      .finally(function () {
+        hairQuizPromise = null;
+      });
+
+    return hairQuizPromise;
+  }
+
+  function askCurrentQuizQuestion() {
+    if (!quizState) return;
+
+    var question = quizState.questions[quizState.index];
+    if (!question) return;
+
+    appendBubble(
+      "assistant",
+      "**Juuksetuubi test " +
+        (quizState.index + 1) +
+        "/" +
+        quizState.questions.length +
+        "**\n" +
+        question.prompt
+    );
+
+    setQuickActions(
+      question.options.map(function (option) {
+        return {
+          label: option.label,
+          kind: "quiz-option",
+          value: option.value,
+        };
+      })
+    );
+  }
+
+  function finishHairQuiz() {
+    if (!quizState) return;
+
+    var answers = Object.assign({}, quizState.answers);
+    quizState = null;
+    refreshComposerAvailability();
+    setQuickActions([]);
+
+    var assistantNode = appendTyping();
+    setBusy(true);
+
+    fetch(config.apiBase + "/api/hair-profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ answers: answers }),
+    })
+      .then(function (response) {
+        return response.json().then(function (payload) {
+          if (!response.ok || !payload.ok) {
+            throw new Error(payload.error || "Juuksetuubi testi ei andnud tulemust.");
+          }
+          return payload;
+        });
+      })
+      .then(function (payload) {
+        setAssistantText(assistantNode, payload.assistantText || "");
+        appendProducts(assistantNode.wrapper, payload.products || []);
+        setQuickActions([
+          { label: "Tee test uuesti", kind: "quiz-start" },
+          { label: "Tarne info", kind: "message", message: "tarne" },
+          { label: "Tagastamine", kind: "message", message: "tagastus" },
+          { label: "Kontakt", kind: "message", message: "kontakt" },
+        ]);
+      })
+      .catch(function (error) {
+        setAssistantText(
+          assistantNode,
+          (error && error.message) || "Juuksetuubi testi ebaonnestus."
+        );
+        setQuickActions(defaultActions);
+      })
+      .finally(function () {
+        setBusy(false);
+        refreshComposerAvailability();
+      });
+  }
+
+  function handleQuizAnswer(action) {
+    if (!quizState) return;
+
+    var question = quizState.questions[quizState.index];
+    if (!question) return;
+
+    var option = question.options.find(function (item) {
+      return item.value === action.value;
+    });
+    if (!option) return;
+
+    quizState.answers[question.id] = option.value;
+    appendBubble("user", option.label);
+    quizState.index += 1;
+
+    if (quizState.index >= quizState.questions.length) {
+      appendBubble(
+        "assistant",
+      "Aitah! Panen su vastused kokku ja soovitan sobiva komplekti."
+      );
+      finishHairQuiz();
+      return;
+    }
+
+    askCurrentQuizQuestion();
+  }
+
+  function startHairQuiz() {
+    setQuickActions([]);
+    appendBubble(
+      "assistant",
+      "Alustame juuksetuubi testiga. Vali igale kysimusele endale koige sobivam variant."
+    );
+    setBusy(true);
+    loadHairQuizQuestions()
+      .then(function (questions) {
+        quizState = {
+          index: 0,
+          answers: {},
+          questions: questions,
+        };
+        refreshComposerAvailability();
+        askCurrentQuizQuestion();
+      })
+      .catch(function (error) {
+        appendBubble(
+          "assistant",
+          (error && error.message) || "Juuksetuubi testi ei ole praegu saadaval."
+        );
+        setQuickActions(defaultActions);
+      })
+      .finally(function () {
+        setBusy(false);
+        refreshComposerAvailability();
+      });
+  }
+
+  function handleAction(action) {
+      if (!action) return;
+    if (isBusy) return;
+    if (action.kind === "quiz-start") {
+      startHairQuiz();
+      return;
+    }
+    if (action.kind === "quiz-option") {
+      handleQuizAnswer(action);
+      return;
+    }
+    if (action.message) {
+      sendMessage(action.message);
+    }
   }
 
   function parseSseBlock(block) {
@@ -407,13 +605,13 @@
     if (initialized) return;
     appendBubble("assistant", config.welcomeMessage);
     appendBubble("assistant", config.exampleMessage);
-    setQuickActions(quickActions);
+    setQuickActions(defaultActions);
     initialized = true;
   }
 
   async function sendMessage(message) {
     var text = String(message || "").trim();
-    if (!text || isBusy) return;
+    if (!text || isBusy || quizState) return;
 
     ensureWelcomeMessages();
     appendBubble("user", text);
@@ -434,6 +632,7 @@
       );
     } finally {
       setBusy(false);
+      setQuickActions(defaultActions);
       input.focus();
       scrollToBottom();
     }
@@ -467,5 +666,6 @@
   closeButton.addEventListener("click", handleClose);
 
   resizeComposer();
+  refreshComposerAvailability();
   setPanelOpen(false);
 })();
