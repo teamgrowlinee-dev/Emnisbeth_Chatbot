@@ -9,12 +9,12 @@
       title: "Emsibethi assistent",
       brandName: "Emsibeth",
       launcherLabel: "Kusi toodete voi klienditoe kohta",
-      tooltipText: "Tere! Kusi toodete voi klienditoe kohta.",
+      tooltipTitle: "Tere!",
+      tooltipText: "Kusi toodete voi klienditoe kohta.",
       welcomeMessage:
         "Tere! Ma olen Emsibethi assistent. Aitan sul leida sobivaid tooteid ja vastan klienditoe kusimustele.",
       exampleMessage:
         'Naiteks void kirjutada: "otsi mask kuivadele juustele" voi "kuidas tagastus kaib?"',
-      iconUrl: "https://emsibeth.ee/media/favicon/default/emsibeth-favicon.png",
       poweredByUrl: "https://growlinee.com/ee",
       poweredByLabel: "Powered by Growlinee",
     },
@@ -61,13 +61,11 @@
     return node;
   }
 
-  function createIconImage(className) {
+  function createEmojiIcon(className) {
     return (
-      '<img class="' +
+      '<span class="' +
       className +
-      '" src="' +
-      escapeHtml(config.iconUrl) +
-      '" alt="" aria-hidden="true">'
+      '" aria-hidden="true">💬</span>'
     );
   }
 
@@ -76,7 +74,12 @@
   var tooltip = createElement(
     "button",
     "ems-chatbot__tooltip",
-    escapeHtml(config.tooltipText)
+    '<span class="ems-chatbot__tooltip-title">' +
+      escapeHtml(config.tooltipTitle) +
+      '</span>' +
+      '<span class="ems-chatbot__tooltip-body">' +
+      escapeHtml(config.tooltipText) +
+      "</span>"
   );
   tooltip.type = "button";
   tooltip.setAttribute("aria-label", config.launcherLabel);
@@ -84,7 +87,7 @@
   var launcher = createElement(
     "button",
     "ems-chatbot__fab",
-    createIconImage("ems-chatbot__fab-icon") +
+    createEmojiIcon("ems-chatbot__fab-icon") +
       '<span class="ems-chatbot__fab-dot" aria-hidden="true"></span>'
   );
   launcher.type = "button";
@@ -100,7 +103,7 @@
     "ems-chatbot__header",
     '<div class="ems-chatbot__brand">' +
       '<div class="ems-chatbot__brand-logo">' +
-      createIconImage("") +
+      createEmojiIcon("ems-chatbot__brand-emoji") +
       "</div>" +
       '<div class="ems-chatbot__brand-copy">' +
       "<strong>" +
