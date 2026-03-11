@@ -6,12 +6,12 @@ const QUIZ_QUESTIONS = [
       { value: "straight", label: "Sirged" },
       { value: "wavy", label: "Lainelised" },
       { value: "curly", label: "Lokkis" },
-      { value: "coily", label: "Vaga lokkis / coily" },
+      { value: "coily", label: "Väga lokkis / coily" },
     ],
   },
   {
     id: "strand",
-    prompt: "Kui votad uhe juuksekarva sormede vahele, kuidas selle paksus tundub?",
+    prompt: "Kui võtad ühe juuksekarva sõrmede vahele, kuidas selle paksus tundub?",
     options: [
       { value: "fine", label: "Pigem peen" },
       { value: "medium", label: "Keskmine" },
@@ -20,32 +20,32 @@ const QUIZ_QUESTIONS = [
   },
   {
     id: "scalp",
-    prompt: "Kuidas su juured ja peanahk tavaliselt paari paeva jooksul parast pesu kaituvad?",
+    prompt: "Kuidas su juured ja peanahk tavaliselt paari päeva jooksul pärast pesu käituvad?",
     options: [
-      { value: "dry", label: "Kuiv voi kiskuv" },
+      { value: "dry", label: "Kuiv või kiskuv" },
       { value: "balanced", label: "Pigem tasakaalus" },
-      { value: "oily", label: "Juured lahevad kiiresti rasuseks" },
-      { value: "flaky", label: "Sugeleb voi tekib helbeid" },
+      { value: "oily", label: "Juured lähevad kiiresti rasuseks" },
+      { value: "flaky", label: "Sügeleb või tekib helbeid" },
     ],
   },
   {
     id: "porosity",
-    prompt: "Kuidas su juuksed vee ja hooldustoodetega tavaliselt kaituvad?",
+    prompt: "Kuidas su juuksed vee ja hooldustoodetega tavaliselt käituvad?",
     options: [
-      { value: "low", label: "Tooted jaavad pigem pinnale ning juuksed kuivavad aeglaselt" },
+      { value: "low", label: "Tooted jäävad pigem pinnale ning juuksed kuivavad aeglaselt" },
       { value: "medium", label: "Niiskus imendub normaalselt ja juuksed ei kuiva liiga kiiresti" },
-      { value: "high", label: "Juuksed imevad kiiresti niiskust, kuid lahevad ka kiiresti kuivaks voi kahuseks" },
-      { value: "unknown", label: "Ma ei oska oelda" },
+      { value: "high", label: "Juuksed imevad kiiresti niiskust, kuid lähevad ka kiiresti kuivaks või kahuseks" },
+      { value: "unknown", label: "Ma ei oska öelda" },
     ],
   },
   {
     id: "damage",
-    prompt: "Kui palju saavad su juuksed kuuma voi keemilist tootlust?",
+    prompt: "Kui palju saavad su juuksed kuuma või keemilist töötlust?",
     options: [
-      { value: "minimal", label: "Vahe - pigem loomulik hooldus" },
-      { value: "color", label: "Varvin aeg-ajalt" },
+      { value: "minimal", label: "Vähe - pigem loomulik hooldus" },
+      { value: "color", label: "Värvin aeg-ajalt" },
       { value: "heat", label: "Kasutan sageli kuuma (foon, sirgendaja, lokitangid)" },
-      { value: "bleached", label: "Heledamaks tehtud voi tuntavalt kahjustatud" },
+      { value: "bleached", label: "Heledamaks tehtud või tuntavalt kahjustatud" },
     ],
   },
   {
@@ -57,7 +57,7 @@ const QUIZ_QUESTIONS = [
       { value: "volume", label: "Kergus ja kohevus" },
       { value: "curl", label: "Lokkide definitsioon" },
       { value: "scalp", label: "Peanaha tasakaal" },
-      { value: "color", label: "Varvikaitse" },
+      { value: "color", label: "Värvikaitse" },
     ],
   },
 ];

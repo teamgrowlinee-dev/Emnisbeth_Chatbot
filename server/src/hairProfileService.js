@@ -8,7 +8,7 @@ const PROFILE_LABELS = {
     straight: "sirged",
     wavy: "lainelised",
     curly: "lokkis",
-    coily: "vaga lokkis",
+    coily: "väga lokkis",
   },
   strand: {
     fine: "peenemad",
@@ -16,22 +16,22 @@ const PROFILE_LABELS = {
     coarse: "paksemad",
   },
   scalp: {
-    dry: "kuiv voi kiskuv peanahk",
+    dry: "kuiv või kiskuv peanahk",
     balanced: "tasakaalus peanahk",
     oily: "kiiremini rasuseks muutuv peanahk",
-    flaky: "helbeid voi sugelaat andev peanahk",
+    flaky: "helbeid või sügelust andev peanahk",
   },
   porosity: {
     low: "madalam poorsus",
     medium: "tasakaalus poorsus",
-    high: "korgem poorsus",
+    high: "kõrgem poorsus",
     unknown: "ebaselge poorsus",
   },
   damage: {
-    minimal: "vaha kahjustust",
-    color: "varvitud juuksed",
+    minimal: "vähe kahjustust",
+    color: "värvitud juuksed",
     heat: "kuumast tekkiv stress",
-    bleached: "tugevam keemiline voi blondeerimisega seotud kahjustus",
+    bleached: "tugevam keemiline või blondeerimisega seotud kahjustus",
   },
   goal: {
     moisture: "niisutus ja kahu taltsutamine",
@@ -39,20 +39,20 @@ const PROFILE_LABELS = {
     volume: "kergus ja kohevus",
     curl: "lokkide definitsioon",
     scalp: "peanaha tasakaal",
-    color: "varvikaitse",
+    color: "värvikaitse",
   },
 };
 
 const ROLE_USAGE_HINTS = {
   "Peanaha sampoon": "Kasuta pesul peamiselt peanahal ja juurtel.",
-  "Sampoon": "Kasuta pesul peamiselt peanahal ja lase vahul pikkustest labi minna.",
+  "Sampoon": "Kasuta pesul peamiselt peanahal ja lase vahul pikkustest läbi minna.",
   "Palsam": "Kasuta peamiselt keskosale ja otstele igal pesul.",
-  "Mask": "Kasuta 1-2 korda nadalas pikkustel ja otstel.",
-  "Nadalane mask": "Kasuta 1-2 korda nadalas sustemaatilise lisahooldusena.",
+  "Mask": "Kasuta 1-2 korda nädalas pikkustel ja otstel.",
+  "Nadalane mask": "Kasuta 1-2 korda nädalas süstemaatilise lisahooldusena.",
   "Kerge hooldus": "Kasuta pikkustel, kui soovid hooldust ilma raskust juurde andmata.",
-  "Viimistlus": "Kasuta vaikeses koguses pikkustel ja otstes vastavalt vajadusele.",
-  "Lopuhooldus": "Kasuta vaikeses koguses pestud juuste pikkustel ja otstes.",
-  "Taastav lisahooldus": "Kasuta kuurina voi regulaarselt vastavalt juuste seisule.",
+  "Viimistlus": "Kasuta väikeses koguses pikkustel ja otstes vastavalt vajadusele.",
+  "Lopuhooldus": "Kasuta väikeses koguses pestud juuste pikkustel ja otstes.",
+  "Taastav lisahooldus": "Kasuta kuurina või regulaarselt vastavalt juuste seisule.",
   "Lisahooldus": "Kasuta toetava lisahooldusena vastavalt vajadusele.",
 };
 
@@ -95,15 +95,15 @@ function buildHairProfile(answers) {
   return {
     answers: normalized,
     flags,
-    title: `${PROFILE_LABELS.strand[normalized.strand]} ${PROFILE_LABELS.pattern[normalized.pattern]} juuksetuup`,
+    title: `${PROFILE_LABELS.strand[normalized.strand]} ${PROFILE_LABELS.pattern[normalized.pattern]} juuksetüüp`,
     summary,
     mainGoal: PROFILE_LABELS.goal[normalized.goal],
     concerns: [
       flags.scalpCare ? "peanaha tasakaal" : null,
       flags.dryness ? "niisutus" : null,
       flags.repair ? "taastamine" : null,
-      flags.colorCare ? "varvikaitse" : null,
-      flags.curl ? "loki- voi lainekuju hoidmine" : null,
+      flags.colorCare ? "värvikaitse" : null,
+      flags.curl ? "loki- või lainekuju hoidmine" : null,
       flags.volume ? "kohevuse hoidmine" : null,
     ].filter(Boolean),
   };
@@ -122,16 +122,16 @@ function buildSearchPlan(profile) {
     if (answers.scalp === "oily") {
       push("Peanaha sampoon", "sampoon rasusele peanahale", "aitab hoida peanaha puhtamana ja tasakaalus");
     } else if (answers.scalp === "flaky") {
-      push("Peanaha sampoon", "sampoon tundlikule peanahale", "sobib, kui peanahk annab helbeid voi sugelaat");
+      push("Peanaha sampoon", "sampoon tundlikule peanahale", "sobib, kui peanahk annab helbeid või sügelust");
     } else {
       push("Peanaha hooldus", "peanaha sampoon", "aitab peanaha mikrokeskkonda tasakaalustada");
     }
   } else if (flags.colorCare) {
-    push("Sampoon", "sampoon varvitud juustele", "peseb ornalt ja aitab varvitooni kauem hoida");
+    push("Sampoon", "sampoon varvitud juustele", "peseb õrnalt ja aitab värvitooni kauem hoida");
   } else if (flags.curl) {
     push("Sampoon", "sampoon lokkis juustele", "toetab loki kuju ja aitab niiskust hoida");
   } else if (flags.repair) {
-    push("Sampoon", "sampoon rikutud juustele", "aitab kulunud juukseid ornalt puhastada");
+    push("Sampoon", "sampoon rikutud juustele", "aitab kulunud juukseid õrnalt puhastada");
   } else if (flags.volume) {
     push("Sampoon", "voluumi sampoon", "sobib peenematele juustele, kui soovid kohevust");
   } else if (flags.dryness) {
@@ -141,7 +141,7 @@ function buildSearchPlan(profile) {
   }
 
   if (flags.colorCare) {
-    push("Palsam", "palsam varvitud juustele", "aitab juuksepinna siledamaks ja varvi pehmemalt hoida");
+    push("Palsam", "palsam varvitud juustele", "aitab juuksepinna siledamaks ja värvi pehmemalt hoida");
   } else if (flags.curl) {
     push("Mask", "mask lokkis juustele", "lisab elastsust ja aitab lokke defineerida");
   } else if (flags.repair) {
@@ -159,8 +159,8 @@ function buildSearchPlan(profile) {
       "Nadalane mask",
       flags.repair ? "mask rikutud juustele" : "mask kuivadele juustele",
       flags.repair
-        ? "annab varvitud voi toodeldud juustele taastavamat lisahooldust"
-        : "aitab lisada varvitud pikkustele pehmust ja niisutust"
+        ? "annab värvitud või töödeldud juustele taastavamat lisahooldust"
+        : "aitab lisada värvitud pikkustele pehmust ja niisutust"
     );
   }
 
@@ -176,7 +176,7 @@ function buildSearchPlan(profile) {
   }
 
   if (answers.damage === "bleached") {
-    push("Taastav lisahooldus", "ampull juuksekasv", "tugevalt toodeldud juustele sobib lisastimuleeriv hooldus juhul kui soovid tugevamat tunnet");
+    push("Taastav lisahooldus", "ampull juuksekasv", "tugevalt töödeldud juustele sobib lisastimuleeriv hooldus juhul kui soovid tugevamat tunnet");
   } else if (flags.scalpCare && answers.scalp === "flaky") {
     push("Lisahooldus", "termaal peanahk", "rahustab peanahka ja toetab tasakaalu");
   }
@@ -216,7 +216,7 @@ async function collectProductsForPlan(plan) {
 function buildFallbackResponse(profile, products) {
   const lines = [
     "**Sinu tulemus**",
-    `Sinu vastuste pohjal tundub, et sul on ${profile.summary[0]}, ${profile.summary[1]} ning peamine fookus on ${profile.mainGoal}.`,
+    `Sinu vastuste põhjal tundub, et sul on ${profile.summary[0]}, ${profile.summary[1]} ning peamine fookus on ${profile.mainGoal}.`,
     "",
     "**Miks selline hinnang**",
     `Peanaha poolelt paistab pigem ${profile.summary[2].toLowerCase()} ja juuksekiu poolelt ${profile.summary[3].toLowerCase()}.`,
@@ -238,13 +238,13 @@ function buildFallbackResponse(profile, products) {
     lines.push("");
     lines.push("**Soovitatud komplekt**");
     lines.push(
-      `Praegu ei leidnud ma poest head komplekti. Koige kindlam on kirjutada ${CONTACT.email} voi helistada ${CONTACT.phone}.`
+      `Praegu ei leidnud ma poest head komplekti. Kõige kindlam on kirjutada ${CONTACT.email} või helistada ${CONTACT.phone}.`
     );
   }
 
   if (profile.answers.scalp === "flaky") {
     lines.push("");
-    lines.push("Kui helbed voi sugelaat on pusivad, tasub lisaks nou pidada spetsialistiga.");
+    lines.push("Kui helbed või sügelus on püsivad, tasub lisaks nõu pidada spetsialistiga.");
   }
 
   return lines.join("\n");
@@ -280,29 +280,29 @@ async function buildAnthropicHairProfileText(profile, answers, products) {
     "Sa oled Emsibethi juuksehoolduse assistent.",
     "Vasta ainult eesti keeles.",
     "Kasuta ainult antud quiz-vastuseid ja antud toodete nimekirja.",
-    "Ara diagnoosi haigusi ega esita meditsiinilisi vaiteid.",
-    "Kui peanaha probleem tundub pusiv, soovita luhidalt spetsialisti nou.",
-    "Kirjuta vastus 3 lyhikese osana:",
+    "Ära diagnoosi haigusi ega esita meditsiinilisi väiteid.",
+    "Kui peanaha probleem tundub püsiv, soovita lühidalt spetsialisti nõu.",
+    "Kirjuta vastus 3 lühikese osana:",
     "1. Tulemuse hinnang",
-    "2. Miks just selline juuksetuup / vajadus",
+    "2. Miks just selline juuksetüüp / vajadus",
     "3. Soovitatud komplekt",
-    "Iga soovitatud toote juures utle lyhidalt ka miks see sobib ja kuidas seda rutiinis kasutada.",
-    "Kasuta vajadusel **rasvast** vormindust ainult pealkirjades voi oluliseks markimiseks.",
+    "Iga soovitatud toote juures ütle lühidalt ka miks see sobib ja kuidas seda rutiinis kasutada.",
+    "Kasuta vajadusel **rasvast** vormindust ainult pealkirjades või oluliseks märkimiseks.",
   ].join("\n");
 
   const userPrompt = [
-    "Kasutaja juuksetuubi testi vastused:",
+    "Kasutaja juuksetüübi testi vastused:",
     answerLines.join("\n"),
     "",
-    "Deterministlik kokkuvote:",
-    `- Tootenahtus: ${profile.title}`,
-    `- Kokkuvote: ${profile.summary.join(", ")}`,
-    `- Pohi-eesmark: ${profile.mainGoal}`,
+    "Deterministlik kokkuvõte:",
+    `- Tootenähtus: ${profile.title}`,
+    `- Kokkuvõte: ${profile.summary.join(", ")}`,
+    `- Põhieesmärk: ${profile.mainGoal}`,
     "",
     "Kandidaattooted Emsibethi poest:",
     productLines.join("\n\n"),
     "",
-    "Selgita luhidalt, mis juuksetuup voi peamised vajadused kasutajal toenaoliselt on, ja soovita komplekt ainult kandidaat-toodetest.",
+    "Selgita lühidalt, mis juuksetüüp või peamised vajadused kasutajal tõenäoliselt on, ja soovita komplekt ainult kandidaat-toodetest.",
   ].join("\n");
 
   return callAnthropic({

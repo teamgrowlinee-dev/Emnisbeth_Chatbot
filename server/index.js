@@ -49,9 +49,9 @@ app.get("/widget/loader.js", (_req, res) => {
       storeBaseUrl: "https://emsibeth.ee",
       title: "Emsibethi assistent",
       brandName: "Emsibeth",
-      launcherLabel: "Kusi toodete voi klienditoe kohta",
+      launcherLabel: "Küsi toodete või klienditoe kohta",
       tooltipTitle: "Tere!",
-      tooltipText: "Tee juuksetuubi test voi kusi toodete ja klienditoe kohta.",
+      tooltipText: "Tee juuksetüübi test või küsi toodete ja klienditoe kohta.",
       vendor: "growlinee",
       widgetVersion: "v1.0.0"
     },

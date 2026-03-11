@@ -22,12 +22,12 @@ function buildSupportResponse(intent) {
 async function buildAnthropicSupportResponse(message, intent) {
   const context = buildSupportContext(intent);
   const userPrompt = [
-    `Kasutaja sonum: ${message}`,
+    `Kasutaja sõnum: ${message}`,
     "",
     "Kontekst:",
     context,
     "",
-    "Vasta 1-3 lausega. Kui vaja, lisa lopus sobiv kontakt- voi abilehe viide.",
+    "Vasta 1-3 lausega. Kui vaja, lisa lõpus sobiv kontakt- või abilehe viide.",
   ].join("\n");
 
   const text = await callAnthropic({
@@ -64,7 +64,7 @@ async function buildAnthropicShoppingText(message, products) {
     "Leitud tooted:",
     productLines.join("\n\n"),
     "",
-    "Kirjuta 1-2 lauset, mis votavad tulemused kokku. Ara leiuta uusi tooteid.",
+    "Kirjuta 1-2 lauset, mis võtavad tulemused kokku. Ära leiuta uusi tooteid.",
   ].join("\n");
 
   const text = await callAnthropic({
@@ -78,14 +78,14 @@ async function buildAnthropicShoppingText(message, products) {
 
 function buildShoppingText(message, products) {
   if (!products.length) {
-    return `Ma ei leidnud praegu sinu sisendi "${message}" jargi otseseid vasteid. Proovi tapsustada marki, toodet voi muret, naiteks "mask kuivadele juustele" voi "seerum lokkis juustele".`;
+    return `Ma ei leidnud praegu sinu sisendi "${message}" järgi otseseid vasteid. Proovi täpsustada märki, toodet või muret, näiteks "mask kuivadele juustele" või "seerum lokkis juustele".`;
   }
 
-  return `Leidsin sinu sisendi "${message}" jargi sobivaid tooteid. Ava allpool tooteleht voi tapsusta veel, millisele juuksetuubile voi murele toodet otsid.`;
+  return `Leidsin sinu sisendi "${message}" järgi sobivaid tooteid. Ava allpool tooteleht või täpsusta veel, millisele juuksetüübile või murele toodet otsid.`;
 }
 
 function buildShoppingClarificationText() {
-  return 'Kirjelda palun tapsamalt, millist toodet otsid. Naiteks "mask kuivadele juustele", "sampoon blondidele" voi "seerum kahustele juustele".';
+  return 'Kirjelda palun täpsemalt, millist toodet otsid. Näiteks "mask kuivadele juustele", "šampoon blondidele" või "seerum kahustele juustele".';
 }
 
 async function buildChatResponse(message) {
@@ -95,7 +95,7 @@ async function buildChatResponse(message) {
   if (!cleanMessage) {
     return {
       mode: "smalltalk",
-      assistantText: "Sisesta kysimus voi tooteotsing.",
+      assistantText: "Sisesta küsimus või tooteotsing.",
       products: [],
     };
   }
@@ -212,8 +212,8 @@ async function buildChatResponse(message) {
     mode: "support",
     assistantText: hasAnthropic()
       ? (await buildAnthropicSupportResponse(cleanMessage, "general")) ||
-        `${SUPPORT_MESSAGES.general} Koige kiirem kontakt on ${CONTACT.email} voi ${CONTACT.phone}.`
-      : `${SUPPORT_MESSAGES.general} Koige kiirem kontakt on ${CONTACT.email} voi ${CONTACT.phone}.`,
+        `${SUPPORT_MESSAGES.general} Kõige kiirem kontakt on ${CONTACT.email} või ${CONTACT.phone}.`
+      : `${SUPPORT_MESSAGES.general} Kõige kiirem kontakt on ${CONTACT.email} või ${CONTACT.phone}.`,
     products: [],
   };
 }

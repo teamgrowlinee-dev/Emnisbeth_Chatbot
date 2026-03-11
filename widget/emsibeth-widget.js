@@ -8,13 +8,13 @@
       storeBaseUrl: "https://emsibeth.ee",
       title: "Emsibethi assistent",
       brandName: "Emsibeth",
-      launcherLabel: "Kusi toodete voi klienditoe kohta",
+      launcherLabel: "Küsi toodete või klienditoe kohta",
       tooltipTitle: "Tere!",
-      tooltipText: "Tee juuksetuubi test voi kusi toodete ja klienditoe kohta.",
+      tooltipText: "Tee juuksetüübi test või küsi toodete ja klienditoe kohta.",
       welcomeMessage:
-        "Tere! Ma olen Emsibethi assistent. Aitan sul leida sobivaid tooteid, teha juuksetuubi testi ja vastan klienditoe kusimustele.",
+        "Tere! Ma olen Emsibethi assistent. Aitan sul leida sobivaid tooteid, teha juuksetüübi testi ja vastan klienditoe küsimustele.",
       exampleMessage:
-        'Naiteks void teha "Juuksetuubi testi", kirjutada "otsi mask kuivadele juustele" voi kysida "kuidas tagastus kaib?"',
+        'Näiteks võid teha "Juuksetüübi testi", kirjutada "otsi mask kuivadele juustele" või küsida "kuidas tagastus käib?"',
       poweredByUrl: "https://growlinee.com/ee",
       poweredByLabel: "Powered by Growlinee",
     },
@@ -22,7 +22,7 @@
   );
 
   var defaultActions = [
-    { label: "Juuksetuubi test", kind: "quiz-start" },
+    { label: "Juuksetüübi test", kind: "quiz-start" },
     { label: "Tarne info", kind: "message", message: "tarne" },
     { label: "Tagastamine", kind: "message", message: "tagastus" },
     { label: "Makseviisid", kind: "message", message: "makse" },
@@ -128,7 +128,7 @@
   var composer = createElement(
     "form",
     "ems-chatbot__footer",
-    '<textarea class="ems-chatbot__input" rows="2" placeholder="Kusi toodete voi klienditoe kohta!"></textarea>' +
+    '<textarea class="ems-chatbot__input" rows="2" placeholder="Küsi toodete või klienditoe kohta!"></textarea>' +
       '<button class="ems-chatbot__send" type="submit">Saada</button>'
   );
 
@@ -175,7 +175,7 @@
     sendButton.textContent = isBusy ? "Laen..." : "Saada";
     input.placeholder = guidedModeActive
       ? "Vali vastus allolevatest variantidest"
-      : "Kusi toodete voi klienditoe kohta!";
+      : "Küsi toodete või klienditoe kohta!";
   }
 
   function setPanelOpen(nextOpen) {
@@ -407,13 +407,13 @@
     hairQuizPromise = fetch(config.apiBase + "/api/hair-quiz")
       .then(function (response) {
         if (!response.ok) {
-          throw new Error("Juuksetuubi testi ei avanenud.");
+          throw new Error("Juuksetüübi test ei avanenud.");
         }
         return response.json();
       })
       .then(function (payload) {
         if (!payload.ok || !Array.isArray(payload.questions)) {
-          throw new Error(payload.error || "Juuksetuubi testi ei ole saadaval.");
+          throw new Error(payload.error || "Juuksetüübi test ei ole saadaval.");
         }
         hairQuizQuestions = payload.questions;
         return hairQuizQuestions;
@@ -433,7 +433,7 @@
 
     appendBubble(
       "assistant",
-      "**Juuksetuubi test " +
+      "**Juuksetüübi test " +
         (quizState.index + 1) +
         "/" +
         quizState.questions.length +
@@ -473,7 +473,7 @@
       .then(function (response) {
         return response.json().then(function (payload) {
           if (!response.ok || !payload.ok) {
-            throw new Error(payload.error || "Juuksetuubi testi ei andnud tulemust.");
+            throw new Error(payload.error || "Juuksetüübi test ei andnud tulemust.");
           }
           return payload;
         });
@@ -491,7 +491,7 @@
       .catch(function (error) {
         setAssistantText(
           assistantNode,
-          (error && error.message) || "Juuksetuubi testi ebaonnestus."
+          (error && error.message) || "Juuksetüübi test ebaõnnestus."
         );
         setQuickActions(defaultActions);
       })
@@ -520,7 +520,7 @@
     if (quizState.index >= quizState.questions.length) {
       appendBubble(
         "assistant",
-      "Aitah! Panen su vastused kokku ja soovitan sobiva komplekti."
+        "Aitäh! Panen su vastused kokku ja soovitan sobiva komplekti."
       );
       finishHairQuiz();
       return;
@@ -561,9 +561,7 @@
     appendProducts(node.wrapper, payload.products || []);
     clearProductFinderState();
     setQuickActions([
-      { label: "Tapsusta uut otsingut", kind: "message", message: "soovita toodet" },
-      { label: "Juuksetuubi test", kind: "quiz-start" },
-      { label: "Tarne info", kind: "message", message: "tarne" },
+      { label: "Juuksetüübi test", kind: "quiz-start" },
       { label: "Kontakt", kind: "message", message: "kontakt" },
     ]);
   }
@@ -614,7 +612,7 @@
         clearProductFinderState();
         appendBubble(
           "assistant",
-          (error && error.message) || "Tooteotsingu tapsustamine ebaonnestus."
+          (error && error.message) || "Tooteotsingu täpsustamine ebaõnnestus."
         );
         setQuickActions(defaultActions);
       })
@@ -627,7 +625,7 @@
     setQuickActions([]);
     appendBubble(
       "assistant",
-      "Alustame juuksetuubi testiga. Vali igale kysimusele endale koige sobivam variant."
+      "Alustame juuksetüübi testiga. Vali igale küsimusele endale kõige sobivam variant."
     );
     setBusy(true);
     loadHairQuizQuestions()
@@ -643,7 +641,7 @@
       .catch(function (error) {
         appendBubble(
           "assistant",
-          (error && error.message) || "Juuksetuubi testi ei ole praegu saadaval."
+          (error && error.message) || "Juuksetüübi test ei ole praegu saadaval."
         );
         setQuickActions(defaultActions);
       })
@@ -708,7 +706,7 @@
     });
 
     if (!response.ok) {
-      throw new Error("Paring ebaonnestus.");
+      throw new Error("Päring ebaõnnestus.");
     }
 
     if (!response.body) {

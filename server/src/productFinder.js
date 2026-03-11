@@ -6,38 +6,38 @@ const PRODUCT_TYPE_QUESTION = {
   id: "productType",
   prompt: "Millist tooteliiki otsid?",
   options: [
-    { value: "sampoon", label: "Sampoon" },
+    { value: "sampoon", label: "Šampoon" },
     { value: "palsam", label: "Palsam" },
     { value: "mask", label: "Mask" },
-    { value: "sprei_seerum", label: "Sprei voi seerum" },
+    { value: "sprei_seerum", label: "Sprei või seerum" },
     { value: "viimistlus", label: "Viimistlustoode" },
-    { value: "ampull_kuur", label: "Ampull voi kuur" },
+    { value: "ampull_kuur", label: "Ampull või kuur" },
     { value: "tooniv", label: "Tooniv toode" },
   ],
 };
 
 const NEED_QUESTION = {
   id: "need",
-  prompt: "Mis on peamine mure voi eesmärk?",
+  prompt: "Mis on peamine mure või eesmärk?",
   options: [
-    { value: "dry", label: "Kuivad voi kahused juuksed" },
-    { value: "repair", label: "Kahjustatud voi toodeldud juuksed" },
-    { value: "curl", label: "Lokkis voi laines juuksed" },
-    { value: "color", label: "Varvitud juuksed" },
+    { value: "dry", label: "Kuivad või kahused juuksed" },
+    { value: "repair", label: "Kahjustatud või töödeldud juuksed" },
+    { value: "curl", label: "Lokkis või laines juuksed" },
+    { value: "color", label: "Värvitud juuksed" },
     { value: "scalp", label: "Peanaha mure" },
-    { value: "growth", label: "Juuksekasv voi valjalangemine" },
+    { value: "growth", label: "Juuksekasv või väljalangemine" },
     { value: "volume", label: "Kohevuse ja kerguse jaoks" },
-    { value: "shine", label: "Sileduse voi sara jaoks" },
+    { value: "shine", label: "Sileduse või sära jaoks" },
   ],
 };
 
 const SCALP_QUESTION = {
   id: "scalpType",
-  prompt: "Milline peanaha mure on koige lahemal?",
+  prompt: "Milline peanaha mure on kõige lähemal?",
   options: [
     { value: "oily", label: "Rasune peanahk" },
-    { value: "sensitive", label: "Tundlik voi kiskuv peanahk" },
-    { value: "flaky", label: "Helbed voi sugav peanahk" },
+    { value: "sensitive", label: "Tundlik või kiskuv peanahk" },
+    { value: "flaky", label: "Helbed või sügelev peanahk" },
   ],
 };
 
@@ -56,39 +56,39 @@ const SERIES_QUESTION = {
 };
 
 const PRODUCT_TYPE_META = {
-  sampoon: { label: "sampoon", search: "sampoon" },
+  sampoon: { label: "šampoon", search: "sampoon" },
   palsam: { label: "palsam", search: "palsam" },
   mask: { label: "mask", search: "mask" },
-  sprei_seerum: { label: "sprei voi seerum", search: "sprei seerum" },
+  sprei_seerum: { label: "sprei või seerum", search: "sprei seerum" },
   viimistlus: { label: "viimistlustoode", search: "viimistlus juustele" },
-  ampull_kuur: { label: "ampull voi kuur", search: "ampull juustele" },
+  ampull_kuur: { label: "ampull või kuur", search: "ampull juustele" },
   tooniv: { label: "tooniv toode", search: "tooniv sampoon palsam" },
 };
 
 const NEED_META = {
-  dry: { label: "kuivad voi kahused juuksed", search: "kuivadele juustele" },
+  dry: { label: "kuivad või kahused juuksed", search: "kuivadele juustele" },
   repair: {
-    label: "kahjustatud voi toodeldud juuksed",
+    label: "kahjustatud või töödeldud juuksed",
     search: "rikutud juustele",
   },
-  curl: { label: "lokkis voi laines juuksed", search: "lokkis juustele" },
-  color: { label: "varvitud juuksed", search: "varvitud juustele" },
+  curl: { label: "lokkis või laines juuksed", search: "lokkis juustele" },
+  color: { label: "värvitud juuksed", search: "varvitud juustele" },
   scalp: { label: "peanaha mure", search: "peanahk" },
   growth: {
-    label: "juuksekasv voi valjalangemine",
+    label: "juuksekasv või väljalangemine",
     search: "juuksekasv",
   },
   volume: { label: "kohevuse ja kerguse jaoks", search: "kohevus juustele" },
-  shine: { label: "sileduse voi sara jaoks", search: "siledus sara juustele" },
+  shine: { label: "sileduse või sära jaoks", search: "siledus sara juustele" },
 };
 
 const SCALP_META = {
   oily: { label: "rasune peanahk", search: "rasusele peanahale" },
   sensitive: {
-    label: "tundlik voi kiskuv peanahk",
+    label: "tundlik või kiskuv peanahk",
     search: "tundlikule peanahale",
   },
-  flaky: { label: "helbed voi sugav peanahk", search: "helbed peanahk" },
+  flaky: { label: "helbed või sügelev peanahk", search: "helbed peanahk" },
 };
 
 const SERIES_META = {
@@ -237,7 +237,7 @@ function buildFollowUpResponse(message, state) {
   return {
     mode: "product_followup",
     assistantText:
-      "Et ma ei pakuks liiga laia valikut, tapsusta palun veel uks asi.\n\n**Tooteotsing**\n" +
+      "Et ma ei pakuks liiga laia valikut, täpsusta palun veel üks asi.\n\n**Tooteotsing**\n" +
       question.prompt,
     question,
     answers: {
@@ -339,13 +339,13 @@ async function buildAnthropicFinderText(message, summary, products) {
   });
 
   const userPrompt = [
-    `Kasutaja algne sonum: ${message}`,
-    `Tapsustatud valik: ${summary.join(", ")}`,
+    `Kasutaja algne sõnum: ${message}`,
+    `Täpsustatud valik: ${summary.join(", ")}`,
     "",
     "Leitud kandidaattooted:",
     productLines.join("\n\n"),
     "",
-    "Kirjuta 2-3 lauset eesti keeles. Utle, miks see valik on sobiv ja et allpool on tapsustatud tulemused. Ara leiuta uusi tooteid.",
+    "Kirjuta 2-3 lauset eesti keeles. Ütle, miks see valik on sobiv ja et allpool on täpsustatud tulemused. Ära leiuta uusi tooteid.",
   ].join("\n");
 
   return callAnthropic({
@@ -383,7 +383,7 @@ async function buildResolvedFinderResponse(message, state) {
     return {
       mode: "shopping",
       assistantText:
-        "Selle tapsustuse pohjal ei leidnud ma kohe sobivat vastet. Proovi teist tooteliiki voi muudame peamist muret.",
+        "Selle täpsustuse põhjal ei leidnud ma kohe sobivat vastet. Proovi teist tooteliiki või muudame peamist muret.",
       products: [],
       searchTerms: result.searchTerms || [],
     };
@@ -392,7 +392,7 @@ async function buildResolvedFinderResponse(message, state) {
   const anthropicText = await buildAnthropicFinderText(message, summary, result.items);
   const assistantText =
     anthropicText ||
-    `Tapsustasin otsingu valikute pohjal: ${summary.join(", ")}. Allpool on koige sobivamad variandid sellest suunast.`;
+    `Täpsustasin otsingu valikute põhjal: ${summary.join(", ")}. Allpool on kõige sobivamad variandid sellest suunast.`;
 
   return {
     mode: "shopping",

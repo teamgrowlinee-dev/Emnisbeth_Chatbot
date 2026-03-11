@@ -19,21 +19,21 @@ const SUPPORT_MESSAGES = {
   greeting:
     "Tere! Olen Emsibethi assistent. Saan aidata klienditoe küsimustega ja leida sobivaid tooteid. Kirjuta näiteks 'otsi kuivadele juustele mask' või küsi tarne kohta.",
   smalltalk:
-    "Kirjuta mulle toote murest voi tootest, mida otsid, voi kusi tarne, tagastuse, makse, kontakti ja tellimuse kohta.",
+    "Kirjuta mulle toote murest või tootest, mida otsid, või küsi tarne, tagastuse, makse, kontakti ja tellimuse kohta.",
   general:
-    `Saan aidata tarne, tagastuse, makse, kontakti ja tellimuse teemadel ning otsida Emsibethi poest tooteid. Vajadusel vota kohe uhendust: ${CONTACT.email} või ${CONTACT.phone}.`,
+    `Saan aidata tarne, tagastuse, makse, kontakti ja tellimuse teemadel ning otsida Emsibethi poest tooteid. Vajadusel võta kohe ühendust: ${CONTACT.email} või ${CONTACT.phone}.`,
   escalation:
-    `Moistan, et olukord on ebameeldiv. Koige kiirem abi tuleb otse klienditoelt: ${CONTACT.email} või ${CONTACT.phone} (${CONTACT.hours}). Kui teema puudutab tellimust, lisa kindlasti tellimuse number.`,
+    `Mõistan, et olukord on ebameeldiv. Kõige kiirem abi tuleb otse klienditoelt: ${CONTACT.email} või ${CONTACT.phone} (${CONTACT.hours}). Kui teema puudutab tellimust, lisa kindlasti tellimuse number.`,
   contact:
     `Emsibethi klienditugi: ${CONTACT.phone} (${CONTACT.hours}), ${CONTACT.email}. Aadress: ${CONTACT.address}. Rohkem: ${LINKS.contact}`,
   shipping:
-    `Kohaletoimetamine kaib Omniva voi Itella Smartposti pakiautomaati. Tarne tavahind algab 3 eurost ja kohaletoimetamise lehel on tasuta tarne piiriks margitud 45 eurot; tavakauba tarneaeg on kuni 3 toopaeeva. Rohkem: ${LINKS.delivery}`,
+    `Kohaletoimetamine käib Omniva või Itella Smartposti pakiautomaati. Tarne tavahind algab 3 eurost ja kohaletoimetamise lehel on tasuta tarne piiriks märgitud 45 eurot; tavakauba tarneaeg on kuni 3 tööpäeva. Rohkem: ${LINKS.delivery}`,
   returns:
-    `Kauba saab tagastada voi vahetada 14 kalendripaeeva jooksul alates kauba kattesaamisest. Tagastamiseks tuleb saata koos kaubaga tagastusavaldus, kaup peab olema kasutamata ja originaalpakendis ning otsesed tagastuskulud kannab klient. Rohkem: ${LINKS.returns}`,
+    `Kauba saab tagastada või vahetada 14 kalendripäeva jooksul alates kauba kättesaamisest. Tagastamiseks tuleb saata koos kaubaga tagastusavaldus, kaup peab olema kasutamata ja originaalpakendis ning otsesed tagastuskulud kannab klient. Rohkem: ${LINKS.returns}`,
   payment:
-    `Tasuda saab Eesti pangalinkidega, Visa/MasterCardiga voi arve alusel. Tellimus kinnitatakse parast makse laekumist ja tapsemad maksetingimused leiad siit: ${LINKS.terms}`,
+    `Tasuda saab Eesti pangalinkidega, Visa/MasterCardiga või arve alusel. Tellimus kinnitatakse pärast makse laekumist ja täpsemad maksetingimused leiad siit: ${LINKS.terms}`,
   order:
-    `Tellimuse staatuse, hilinemise voi tarneprobleemi korral kirjuta ${CONTACT.email} voi helista ${CONTACT.phone} (${CONTACT.hours}). Lisa kindlasti tellimuse number ja lyhike probleemi kirjeldus.`,
+    `Tellimuse staatuse, hilinemise või tarneprobleemi korral kirjuta ${CONTACT.email} või helista ${CONTACT.phone} (${CONTACT.hours}). Lisa kindlasti tellimuse number ja lühike probleemi kirjeldus.`,
 };
 
 const STORE_KNOWLEDGE = [
@@ -45,30 +45,30 @@ const STORE_KNOWLEDGE = [
   "",
   `Tarne: tasuta tarne alates 45 eurost, tavahind alates 3 eurost.`,
   "Tarneviisid: Omniva pakiautomaat, Itella Smartpost pakiautomaat.",
-  "Tavakauba tarneaeg: kuni 3 toopaeeva ostu sooritamisest, kui tootel pole pikemat tarneaega.",
+  "Tavakauba tarneaeg: kuni 3 tööpäeva ostu sooritamisest, kui tootel pole pikemat tarneaega.",
   "",
   "Tagastus ja vahetamine:",
-  "Kliendil on oigus taganeda lepingust 14 kalendripaeeva jooksul alates kauba kattesaamisest.",
+  "Kliendil on õigus taganeda lepingust 14 kalendripäeva jooksul alates kauba kättesaamisest.",
   "Tagastatav kaup peab olema kasutamata ja originaalpakendis.",
   "Tagastamisega seotud otsesed kulud kannab klient.",
   "",
   "Makse:",
-  "Tasuda saab Eesti pangalinkidega, Visa/MasterCardiga voi arve alusel.",
-  "Tellimus kinnitatakse parast ostusumma laekumist.",
+  "Tasuda saab Eesti pangalinkidega, Visa/MasterCardiga või arve alusel.",
+  "Tellimus kinnitatakse pärast ostusumma laekumist.",
   "",
   `Kontaktleht: ${LINKS.contact}`,
   `Tarneleht: ${LINKS.delivery}`,
   `Tagastusleht: ${LINKS.returns}`,
-  `Muugitingimused: ${LINKS.terms}`,
+  `Müügitingimused: ${LINKS.terms}`,
 ].join("\n");
 
 const ANTHROPIC_SYSTEM_PROMPT = [
   "Sa oled Emsibethi klienditoe ja poe assistent.",
-  "Vasta eesti keeles, luhidalt ja konkreetselt.",
-  "Kui kusimus on klienditoe kohta, vasta ainult allpool toodud poeteabe pohjal.",
-  "Ara leiuta tarne-, tagastus-, makse- ega kontaktitingimusi.",
+  "Vasta eesti keeles, lühidalt ja konkreetselt.",
+  "Kui küsimus on klienditoe kohta, vasta ainult allpool toodud poeteabe põhjal.",
+  "Ära leiuta tarne-, tagastus-, makse- ega kontaktitingimusi.",
   "Kui kasutaja otsib toodet, kasuta tooteandmeid, mis antakse eraldi kontekstina.",
-  `Kui infost ei piisa, suuna kasutaja kirjutama ${CONTACT.email} voi helistama ${CONTACT.phone}.`,
+  `Kui infost ei piisa, suuna kasutaja kirjutama ${CONTACT.email} või helistama ${CONTACT.phone}.`,
   "",
   "POE TEAVE:",
   STORE_KNOWLEDGE,
