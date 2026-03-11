@@ -360,6 +360,10 @@
   animation: emsMsgFadeIn 0.3s ease;
 }
 
+.ems-chatbot__message--options {
+  max-width: 88%;
+}
+
 .ems-chatbot__bubble {
   margin: 0;
   padding: 12px 16px;
@@ -392,6 +396,45 @@
 .ems-chatbot__bubble a {
   color: inherit;
   text-decoration: underline;
+}
+
+.ems-chatbot__option-list {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 0 0;
+}
+
+.ems-chatbot__option-button {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid rgba(221, 179, 200, 0.22);
+  border-radius: 14px;
+  background: rgba(26, 20, 17, 0.84);
+  color: var(--ems-text);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ems-chatbot__option-button:hover {
+  background: rgba(221, 179, 200, 0.12);
+  border-color: rgba(221, 179, 200, 0.36);
+}
+
+.ems-chatbot__option-button--selected {
+  background: linear-gradient(135deg, var(--ems-accent), var(--ems-accent-strong));
+  color: #1b1411;
+  border-color: transparent;
+}
+
+.ems-chatbot__option-button--disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .ems-chatbot__typing {
@@ -771,7 +814,8 @@
   }
 
   .ems-chatbot__bubble,
-  .ems-chatbot__typing {
+  .ems-chatbot__typing,
+  .ems-chatbot__message--options {
     max-width: 94%;
   }
 }

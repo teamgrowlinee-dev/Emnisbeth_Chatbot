@@ -154,6 +154,7 @@
   var initialized = false;
   var quizState = null;
   var productFinderState = null;
+  var guidedOptionsNode = null;
   var hairQuizQuestions = null;
   var hairQuizPromise = null;
 
@@ -198,12 +199,14 @@
       return;
     }
 
-    var isQuizOptions = items.every(function (item) {
+    var isGuidedOptions = items.every(function (item) {
       return item && (item.kind === "quiz-option" || item.kind === "finder-option");
     });
 
-    if (isQuizOptions) {
-      chips.classList.add("ems-chatbot__chips--quiz");
+    if (isGuidedOptions) {
+      chips.classList.add("ems-chatbot__chips--hidden");
+      appendGuidedOptions(items);
+      return;
     }
 
     items.forEach(function (item) {
@@ -214,11 +217,8 @@
       );
       button.type = "button";
       button.title = item.label;
-      if (item.kind === "quiz-option" || item.kind === "finder-option") {
-        button.classList.add("ems-chatbot__chip--option");
-      }
       button.addEventListener("click", function () {
-        handleAction(item);
+        handleAction(item, button);
       });
       chips.appendChild(button);
     });
@@ -240,6 +240,52 @@
       bubble: bubble,
       text: "",
     };
+  }
+
+  function disableGuidedOptions(selectedButton) {
+    if (!guidedOptionsNode) return;
+
+    var buttons = guidedOptionsNode.querySelectorAll(".ems-chatbot__option-button");
+    buttons.forEach(function (button) {
+      button.disabled = true;
+      button.classList.add("ems-chatbot__option-button--disabled");
+    });
+
+    if (selectedButton) {
+      selectedButton.classList.remove("ems-chatbot__option-button--disabled");
+      selectedButton.classList.add("ems-chatbot__option-button--selected");
+    }
+
+    guidedOptionsNode = null;
+  }
+
+  function appendGuidedOptions(items) {
+    disableGuidedOptions();
+
+    var wrapper = createElement(
+      "article",
+      "ems-chatbot__message ems-chatbot__message--assistant ems-chatbot__message--options"
+    );
+    var optionList = createElement("div", "ems-chatbot__option-list");
+
+    items.forEach(function (item) {
+      var button = createElement(
+        "button",
+        "ems-chatbot__option-button",
+        escapeHtml(item.label)
+      );
+      button.type = "button";
+      button.title = item.label;
+      button.addEventListener("click", function () {
+        handleAction(item, button);
+      });
+      optionList.appendChild(button);
+    });
+
+    wrapper.appendChild(optionList);
+    messages.appendChild(wrapper);
+    guidedOptionsNode = optionList;
+    scrollToBottom();
   }
 
   function appendBubble(role, text) {
@@ -455,7 +501,7 @@
       });
   }
 
-  function handleQuizAnswer(action) {
+  function handleQuizAnswer(action, sourceButton) {
     if (!quizState) return;
 
     var question = quizState.questions[quizState.index];
@@ -466,6 +512,7 @@
     });
     if (!option) return;
 
+    disableGuidedOptions(sourceButton);
     quizState.answers[question.id] = option.value;
     appendBubble("user", option.label);
     quizState.index += 1;
@@ -521,7 +568,7 @@
     ]);
   }
 
-  function handleFinderAnswer(action) {
+  function handleFinderAnswer(action, sourceButton) {
     if (!productFinderState || !productFinderState.question) return;
 
     var option = productFinderState.question.options.find(function (item) {
@@ -529,6 +576,7 @@
     });
     if (!option) return;
 
+    disableGuidedOptions(sourceButton);
     var nextAnswers = Object.assign({}, productFinderState.answers, {});
     nextAnswers[productFinderState.question.id] = option.value;
     appendBubble("user", option.label);
@@ -605,7 +653,7 @@
       });
   }
 
-  function handleAction(action) {
+  function handleAction(action, sourceButton) {
     if (!action) return;
     if (isBusy) return;
     if (action.kind === "quiz-start") {
@@ -613,11 +661,11 @@
       return;
     }
     if (action.kind === "quiz-option") {
-      handleQuizAnswer(action);
+      handleQuizAnswer(action, sourceButton);
       return;
     }
     if (action.kind === "finder-option") {
-      handleFinderAnswer(action);
+      handleFinderAnswer(action, sourceButton);
       return;
     }
     if (action.message) {
