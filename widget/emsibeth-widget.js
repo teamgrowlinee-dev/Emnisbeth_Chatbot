@@ -190,10 +190,19 @@
 
   function setQuickActions(items) {
     chips.innerHTML = "";
+    chips.classList.remove("ems-chatbot__chips--quiz");
 
     if (!Array.isArray(items) || !items.length) {
       chips.classList.add("ems-chatbot__chips--hidden");
       return;
+    }
+
+    var isQuizOptions = items.every(function (item) {
+      return item && item.kind === "quiz-option";
+    });
+
+    if (isQuizOptions) {
+      chips.classList.add("ems-chatbot__chips--quiz");
     }
 
     items.forEach(function (item) {
@@ -203,6 +212,10 @@
         escapeHtml(item.label)
       );
       button.type = "button";
+      button.title = item.label;
+      if (item.kind === "quiz-option") {
+        button.classList.add("ems-chatbot__chip--option");
+      }
       button.addEventListener("click", function () {
         handleAction(item);
       });

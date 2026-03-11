@@ -440,7 +440,16 @@
   display: none !important;
 }
 
+.ems-chatbot__chips--quiz {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
 .ems-chatbot__chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 7px 15px;
   border: 1px solid rgba(221, 179, 200, 0.22);
   border-radius: 20px;
@@ -451,6 +460,16 @@
   white-space: nowrap;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.ems-chatbot__chip--option {
+  width: 100%;
+  justify-content: flex-start;
+  padding: 10px 14px;
+  border-radius: 14px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.4;
 }
 
 .ems-chatbot__chip:hover {
