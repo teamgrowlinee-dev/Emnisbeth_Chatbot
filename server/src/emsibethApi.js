@@ -39,20 +39,37 @@ const STOPWORDS = new Set([
   "otsi",
   "leia",
   "soovin",
+  "soovita",
+  "soovitus",
+  "soovitusi",
+  "soovitaks",
   "tahan",
   "kas",
   "teil",
   "palun",
+  "paluks",
   "mulle",
   "sobiv",
   "sobivaid",
   "midagi",
+  "mingit",
+  "mingeid",
   "hea",
+  "head",
+  "paremat",
+  "parimat",
   "parim",
   "oleks",
   "on",
   "toode",
+  "toodet",
+  "tootele",
+  "tootega",
+  "toote",
+  "toodete",
   "tooteid",
+  "asja",
+  "asju",
   "juurde",
   "ja",
   "voi",
@@ -81,6 +98,7 @@ function normalizeSearchWord(word) {
     .replace(/ü/g, "u");
 
   const replacements = [
+    [/shampoon/g, "sampoon"],
     [/shampoo/g, "sampoon"],
     [/conditioner/g, "palsam"],
     [/spray/g, "sprei"],
@@ -123,11 +141,7 @@ function normalizeSearchText(input) {
 }
 
 function buildSearchTerms(message) {
-  const normalized = normalizeSearchText(message);
-  const rawTokens = normalized
-    .split(/\s+/)
-    .map((token) => token.trim())
-    .filter((token) => token.length >= 3 && !STOPWORDS.has(token));
+  const rawTokens = buildSearchTokens(message);
 
   const seen = new Set();
   const terms = [];
@@ -139,8 +153,12 @@ function buildSearchTerms(message) {
     terms.push(value);
   }
 
-  add(normalized);
-  if (rawTokens.length > 1) add(rawTokens.slice(0, 4).join(" "));
+  if (!rawTokens.length) {
+    return [];
+  }
+
+  add(rawTokens.slice(0, 4).join(" "));
+  if (rawTokens.length > 1) add(rawTokens.slice(0, 2).join(" "));
 
   for (let index = 0; index < rawTokens.length; index += 1) {
     add(rawTokens[index]);
@@ -243,9 +261,26 @@ async function searchProducts(message, options) {
   const searchTerms = buildSearchTerms(message);
   const searchTokens = buildSearchTokens(message);
   const bySku = new Map();
+  let hadSuccessfulQuery = false;
+  let lastError = null;
+
+  if (!searchTerms.length) {
+    return {
+      items: [],
+      searchTerms,
+    };
+  }
 
   for (const term of searchTerms) {
-    const items = await queryProducts(term, pageSize);
+    let items = [];
+    try {
+      items = await queryProducts(term, pageSize);
+      hadSuccessfulQuery = true;
+    } catch (error) {
+      lastError = error;
+      continue;
+    }
+
     for (const item of items) {
       if (!bySku.has(item.sku)) {
         bySku.set(item.sku, item);
@@ -257,6 +292,10 @@ async function searchProducts(message, options) {
     if (bySku.size >= limit) {
       break;
     }
+  }
+
+  if (!hadSuccessfulQuery && lastError) {
+    throw lastError;
   }
 
   const ranked = Array.from(bySku.values())

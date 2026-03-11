@@ -298,5 +298,5 @@
   });
 
   appendBubble("assistant", config.welcomeMessage);
-  setPanelOpen(true);
+  setPanelOpen(false);
 })();

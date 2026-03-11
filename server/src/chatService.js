@@ -83,6 +83,10 @@ function buildShoppingText(message, products) {
   return `Leidsin sinu sisendi "${message}" jargi sobivaid tooteid. Ava allpool tooteleht voi tapsusta veel, millisele juuksetuubile voi murele toodet otsid.`;
 }
 
+function buildShoppingClarificationText() {
+  return 'Kirjelda palun tapsamalt, millist toodet otsid. Naiteks "mask kuivadele juustele", "sampoon blondidele" voi "seerum kahustele juustele".';
+}
+
 async function buildChatResponse(message) {
   const cleanMessage = String(message || "").trim();
   const intent = detectIntent(cleanMessage);
@@ -163,6 +167,15 @@ async function buildChatResponse(message) {
   }
 
   const searchResult = await searchProducts(cleanMessage, { limit: 6 });
+  if (!searchResult.searchTerms.length) {
+    return {
+      mode: "shopping",
+      assistantText: buildShoppingClarificationText(),
+      products: [],
+      searchTerms: [],
+    };
+  }
+
   if (searchResult.items.length) {
     const anthropicText = hasAnthropic()
       ? await buildAnthropicShoppingText(cleanMessage, searchResult.items)
