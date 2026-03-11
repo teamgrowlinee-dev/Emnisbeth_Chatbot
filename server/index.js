@@ -38,7 +38,10 @@ app.get("/widget/loader.js", (_req, res) => {
       apiBase: "${RENDER_URL}",
       storeBaseUrl: "https://emsibeth.ee",
       title: "Emsibethi assistent",
+      brandName: "Emsibeth",
       launcherLabel: "Kusi toodete voi klienditoe kohta",
+      tooltipText: "Tere! Kusi toodete voi klienditoe kohta.",
+      iconUrl: "https://emsibeth.ee/media/favicon/default/emsibeth-favicon.png",
       vendor: "growlinee",
       widgetVersion: "v1.0.0"
     },
